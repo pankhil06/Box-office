@@ -1,15 +1,21 @@
 import React from 'react';
 import {Route,Switch} from 'react-router-dom'
+import Navs from './components/Navs';
+import Home from './pages/Home';
+import Starred from './pages/Starred';
 
 function App() {
   return (
+    <div>
+      <Navs />
     <Switch>
+        
         <Route exact path='/'>
-          this is home page
+          <Home />
         </Route>
         
         <Route exact path='/starred'>
-          this is starred
+          <Starred />
         </Route>
 
         <Route >
@@ -17,6 +23,7 @@ function App() {
         </Route>
 
     </Switch>
+    </div>
   );
 }
 

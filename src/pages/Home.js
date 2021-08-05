@@ -3,47 +3,61 @@ import ActorGrid from '../actors/ActorGrid'
 import MainPageLayout from '../components/MainPageLayout'
 import { apiGet } from '../misc/config'
 import ShowGrid from '../shows/ShowGrid'
+import { useLastQuery } from '../misc/custom-hooks'
 
 const Home = () => {
-    
-    const [input,setInput]=useState('')
-    const [results,setResults]=useState(null)
-    const [searchOption, setSearchOption] = useState('shows');
-    const isShowsSearch = searchOption === 'shows';
-    
-    const onSearch=()=>{
-        apiGet(`/search/${searchOption}?q=${input}`).then(result => {
-            setResults(result);
-          });
+  const [input, setInput] = useLastQuery();
+  const [results, setResults] = useState(null);
+  const [searchOption, setSearchOption] = useState('shows');
+
+  const isShowsSearch = searchOption === 'shows';
+  const onSearch = () => {
+    apiGet(`/search/${searchOption}?q=${input}`).then(result => {
+      setResults(result);
+    });
+  };
+
+  const onInputChange = ev => {
+    setInput(ev.target.value);
+  };
+
+  const onKeyDown = ev => {
+    if (ev.keyCode === 13) {
+      onSearch();
+    }
+  };
+
+  const onRadioChange = ev => {
+    setSearchOption(ev.target.value);
+  };
+
+  const renderResults = () => {
+    if (results && results.length === 0) {
+      return <div>No results</div>;
     }
 
-    const onInputChange= ev=>{
-        setInput(ev.target.value)
-    }
-    
-
-    const onKeyPressed=(ev)=>{
-        if(ev.keyCode===13)
-        onSearch()
-    }
-    const onRadioChange = ev => {
-        setSearchOption(ev.target.value);
-      };
-
-    const renderResults=()=>{
-        if(results && results.length===0){
-            return <div>No results</div>
-        }
-        if (results && results.length > 0) {
-            return results[0].show ?<ShowGrid data={results} /> : <ActorGrid data={results} />
-        }
-        return null
+    if (results && results.length > 0) {
+      return results[0].show ? (
+        <ShowGrid data={results} />
+      ) : (
+        <ActorGrid data={results} />
+      );
     }
 
-    return (
-        <MainPageLayout>
-            <input type='text' placeholder='Search for something' onChange={onInputChange} onKeyDown={onKeyPressed} value={input}/>
-            <div>
+    return null;
+  };
+
+  return (
+    <MainPageLayout>
+      <input
+        type="text"
+        placeholder="Search for something"
+        onChange={onInputChange}
+        onKeyDown={onKeyDown}
+        value={input}
+      />
+
+      <div>
         <label htmlFor="shows-search">
           Shows
           <input
@@ -66,10 +80,13 @@ const Home = () => {
           />
         </label>
       </div>
-            <button type='button' onClick={onSearch}>Search</button> 
-            {renderResults()}
-        </MainPageLayout>
-    )
-}
 
-export default Home
+      <button type="button" onClick={onSearch}>
+        Search
+      </button>
+      {renderResults()}
+    </MainPageLayout>
+  );
+};
+
+export default Home;
